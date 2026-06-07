@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KCE Developer</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            display: flex;
+            min-height: 100vh;
+            background-color: #ffffff;
+            overflow-x: hidden;
+        }
+
+        /* --- Sidebar Navigation --- */
+        aside {
+            width: 280px;
+            background-color: #e6e6e6;
+            border-right: 1px solid #dcdcdc;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 40px 0 20px 0;
+            flex-shrink: 0;
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            z-index: 100;
+        }
+
+        .brand-title {
+            font-size: 32px;
+            font-weight: 500;
+            line-height: 1.2;
+            color: #000000;
+            padding: 0 30px;
+            margin-bottom: 40px;
+        }
+
+        nav {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+        }
+
+        .nav-item {
+            display: block;
+            padding: 15px 30px;
+            font-size: 18px;
+            color: #000000;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            user-select: none;
+        }
+
+        .nav-item.active {
+            background-color: #cbeffc;
+            font-weight: 500;
+        }
+
+        .nav-item:hover:not(.active) {
+            background-color: #dadada;
+        }
+
+        .sidebar-footer {
+            font-size: 10px;
+            color: #555555;
+            padding: 0 20px;
+        }
+
+        /* --- Main Content Container --- */
+        main {
+            margin-left: 280px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .top-bar {
+            height: 40px;
+            background-color: #ededed;
+            border-bottom: 1px solid #dcdcdc;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 20px;
+            color: #000000;
+        }
+
+        .page-view {
+            display: none;
+            padding: 60px 50px;
+            width: 100%;
+        }
+
+        .page-view.active-view {
+            display: block;
+        }
+
+        /* --- Page 1: Home Panels --- */
+        .heading-container {
+            position: relative;
+            padding-left: 25px;
+            margin-bottom: 50px;
+        }
+
+        .heading-container::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 5px;
+            bottom: 5px;
+            width: 4px;
+            background-color: #ff9500;
+        }
+
+        .heading-container::after {
+            content: "";
+            position: absolute;
+            left: 8px;
+            top: 5px;
+            bottom: 5px;
+            width: 4px;
+            background-color: #007aff;
+        }
+
+        h1 {
+            font-size: 56px;
+            font-weight: 400;
+            line-height: 1.15;
+            color: #000000;
+        }
+
+        .home-grid {
+            display: flex;
+            gap: 25px;
+            margin-top: 20px;
+            max-width: 800px;
+        }
+
+        /* --- Reusable Card Component Styles --- */
+        .card {
+            background-color: #eaeaea;
+            border: 2px solid #cecece;
+            border-radius: 8px;
+            padding: 30px;
+            width: 320px;
+            min-height: 420px;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+
+        .card-title {
+            font-size: 22px;
+            font-weight: 400;
+            margin-bottom: 30px;
+            color: #000000;
+        }
+
+        .card-text {
+            font-size: 20px;
+            line-height: 1.3;
+            color: #000000;
+        }
+
+        .card-image-container {
+            width: 100%;
+            height: 200px;
+            background-color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 25px;
+            overflow: hidden;
+            border: 1px solid #dcdcdc;
+        }
+
+        .project-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .card-project-title {
+            font-size: 20px;
+            text-align: center;
+            line-height: 1.3;
+            margin-top: auto;
+            color: #000000;
+        }
+
+        /* --- Page 2: Project Panel Layouts --- */
+        .project-flex-layout {
+            display: flex;
+            gap: 40px;
+            align-items: flex-start;
+            margin-top: 20px;
+            max-width: 800px;
+        }
+
+        .project-card-right {
+            margin-top: 80px; 
+            justify-content: flex-start;
+            gap: 35px;
+            padding-top: 40px;
+        }
+
+        .project-text-title {
+            font-size: 22px;
+            color: #000000;
+            text-align: center;
+            width: 100%;
+        }
+
+        .project-text-sub {
+            font-size: 22px;
+            color: #000000;
+            text-align: center;
+            width: 100%;
+        }
+
+        /* --- Page 3: Purchase Panel Layouts --- */
+        .purchase-card {
+            background-color: #eaeaea;
+            border: 2px solid #cecece;
+            border-radius: 8px;
+            padding: 40px;
+            width: 100%;
+            max-width: 850px;
+            min-height: 380px;
+            display: flex;
+            flex-direction: row;
+            gap: 40px;
+            align-items: flex-start;
+            margin-top: 20px;
+        }
+
+        .purchase-image-wrapper {
+            width: 260px;
+            height: 240px;
+            flex-shrink: 0;
+            background-color: #ffffff;
+            border: 1px solid #dcdcdc;
+            overflow: hidden;
+        }
+
+        .purchase-info-content {
+            display: flex;
+            flex-direction: column;
+            color: #000000;
+            height: 100%;
+            width: 100%;
+        }
+
+        .purchase-main-title {
+            font-size: 26px;
+            font-weight: 400;
+            margin-bottom: 8px;
+        }
+
+        .purchase-sub-title {
+            font-size: 22px;
+            color: #666666;
+            margin-bottom: 20px;
+        }
+
+        .purchase-features-list {
+            list-style-type: disc;
+            padding-left: 25px;
+            margin-bottom: 35px;
+        }
+
+        .purchase-features-list li {
+            font-size: 22px;
+            color: #444444;
+            margin-bottom: 8px;
+            line-height: 1.3;
+        }
+
+        .purchase-action-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-top: auto;
+        }
+
+        .purchase-status-badge {
+            background-color: #cbeffc;
+            color: #000000;
+            font-size: 20px;
+            padding: 12px 24px;
+            border-radius: 8px;
+            box-shadow: 0px 2px 4px rgba(0,0,0,0.08);
+            user-select: none;
+        }
+
+        .purchase-arrow-btn {
+            background-color: #cbeffc;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0px 2px 4px rgba(0,0,0,0.08);
+            transition: opacity 0.2s ease;
+        }
+
+        .purchase-arrow-btn:hover {
+            opacity: 0.85;
+        }
+
+        /* --- Page 4: Error Screen Layout --- */
+        .error-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding-top: 100px;
+            width: 100%;
+        }
+
+        .error-circle {
+            width: 130px;
+            height: 130px;
+            background-color: #f46464;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 40px;
+        }
+
+        .error-title {
+            font-size: 28px;
+            color: #000000;
+            font-weight: 400;
+            margin-bottom: 30px;
+        }
+
+        .error-subtitle {
+            font-size: 24px;
+            color: #000000;
+            font-weight: 400;
+        }
+
+        /* Responsive Breakpoints */
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+            }
+            aside {
+                width: 100%;
+                position: relative;
+                padding: 20px 0;
+            }
+            main {
+                margin-left: 0;
+            }
+            .page-view {
+                padding: 30px 20px;
+            }
+            h1 {
+                font-size: 38px;
+            }
+            .home-grid, .project-flex-layout {
+                flex-direction: column;
+                align-items: center;
+                gap: 25px;
+            }
+            .card {
+                width: 100%;
+                max-width: 360px;
+            }
+            .project-card-right {
+                margin-top: 0;
+            }
+            .purchase-card {
+                flex-direction: column;
+                align-items: center;
+                padding: 25px;
+            }
+            .purchase-image-wrapper {
+                width: 100%;
+                max-width: 280px;
+            }
+            .purchase-action-row {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar Layout Components -->
+    <aside>
+        <div>
+            <div class="brand-title">KCE<br>Developer</div>
+            <nav>
+                <div id="nav-home" class="nav-item" onclick="switchPage('home')">Home</div>
+                <div id="nav-project" class="nav-item" onclick="switchPage('project')">Project</div>
+                <div id="nav-purchase" class="nav-item" onclick="switchPage('purchase')">Purchase</div>
+            </nav>
+        </div>
+        <div class="sidebar-footer">
+            KCE developer 2026 - All right reserve - since 2021
+        </div>
+    </aside>
+
+    <!-- Main Workspace Frame -->
+    <main>
+        <div class="top-bar" id="top-bar-text"></div>
+        
+        <!-- ================= PANEL VIEW 1: HOME ================= -->
+        <div id="view-home" class="page-view">
+            <div class="heading-container">
+                <h1>The future of<br>Builiding<br>Architechture</h1>
+            </div>
+
+            <div class="home-grid">
+                <div class="card">
+                    <div class="card-title">Good day 🍀</div>
+                    <div class="card-text">
+                        As SOLO<br>
+                        developer<br>
+                        our project may<br>
+                        take around 1 - 2<br>
+                        Years
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-image-container">
+                        <!-- Loaded direct asset image path -->
+                        <img src="noFilter.webp" alt="Pentagon HQ" class="project-img">
+                    </div>
+                    <div class="card-project-title">
+                        our latest project<br>Pentagon HQ
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= PANEL VIEW 2: PROJECTS ================= -->
+        <div id="view-project" class="page-view">
+            <div class="project-flex-layout">
+                <div class="card">
+                    <div class="card-image-container">
+                        <!-- Loaded direct asset image path -->
+                        <img src="noFilter.webp" alt="Pentagon HQ" class="project-img">
+                    </div>
+                    <div class="card-project-title">
+                        our latest project<br>Pentagon HQ
+                    </div>
+                </div>
+
+                <div class="card project-card-right">
+                    <div class="project-text-title">Aqua city center</div>
+                    <div class="project-text-sub">M4 ESC TP</div>
+                    <div class="project-text-sub">M3 ESC TP</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= PANEL VIEW 3: PURCHASE ================= -->
+        <div id="view-purchase" class="page-view">
+            <div class="purchase-card">
+                <div class="purchase-image-wrapper">
+                    <!-- Loaded direct asset image path -->
+                    <img src="noFilter.webp" alt="Pentagon HQ" class="project-img">
+                </div>
+                <div class="purchase-info-content">
+                    <div class="purchase-main-title">Floor purchasing</div>
+                    <div class="purchase-sub-title">what you can expect</div>
+                    <ul class="purchase-features-list">
+                        <li>Large floor with 6 elevator</li>
+                        <li>custom floor design</li>
+                    </ul>
+                    <div class="purchase-action-row">
+                        <div class="purchase-status-badge">Expect to come in 2027</div>
+                        <button class="purchase-arrow-btn" onclick="switchPage('error')">
+                            <svg width="34" height="20" viewBox="0 0 34 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M1 10H31M31 10L22 1M31 10L22 19" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= PANEL VIEW 4: ERROR PAGE ================= -->
+        <div id="view-error" class="page-view">
+            <div class="error-container">
+                <div class="error-circle">
+                    <svg width="46" height="46" viewBox="0 0 46 46" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M3 3L43 43M43 3L3 43" stroke="black" stroke-width="3" stroke-linecap="round"/>
+                    </svg>
+                </div>
+                <div class="error-title font-title">Access Denied [Err: 204]</div>
+                <div class="error-subtitle font-sub">You have no permission to enter this site</div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        function switchPage(pageId) {
+            document.getElementById('nav-home').classList.remove('active');
+            document.getElementById('nav-project').classList.remove('active');
+            document.getElementById('nav-purchase').classList.remove('active');
+
+            document.getElementById('view-home').classList.remove('active-view');
+            document.getElementById('view-project').classList.remove('active-view');
+            document.getElementById('view-purchase').classList.remove('active-view');
+            document.getElementById('view-error').classList.remove('active-view');
+
+            const topBar = document.getElementById('top-bar-text');
+            
+            if (pageId === 'home') {
+                document.getElementById('nav-home').classList.add('active');
+                document.getElementById('view-home').classList.add('active-view');
+                topBar.innerText = ""; 
+            } else if (pageId === 'project') {
+                document.getElementById('nav-project').classList.add('active');
+                document.getElementById('view-project').classList.add('active-view');
+                topBar.innerText = "Project"; 
+            } else if (pageId === 'purchase') {
+                document.getElementById('nav-purchase').classList.add('active');
+                document.getElementById('view-purchase').classList.add('active-view');
+                topBar.innerText = "Purchase"; 
+            } else if (pageId === 'error') {
+                document.getElementById('nav-purchase').classList.add('active');
+                document.getElementById('view-error').classList.add('active-view');
+                topBar.innerText = ""; 
+            }
+        }
+
+        window.onload = function() {
+            switchPage('home');
+        };
+    </script>
+</body>
+</html>
